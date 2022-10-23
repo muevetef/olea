@@ -1,4 +1,5 @@
-#include <WiFi.h>
+//#include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
@@ -8,21 +9,22 @@ const int pir = 27;
 boolean pirTriggered = false;
 
 //const char *server_url = "http://olea-api.herokuapp.com";// Nodejs application endpoint
-const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
-
+//const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
+const char *server_url = "https://olea-test.herokuapp.com";// Nodejs application e
 //const char* ssid     = "MUEVETE3";     // your network SSID (name of wifi network)
 //const char* password = "formacion"; // your network password
 const char* ssid     = "MiFibra-2FC9";     // your network SSID (name of wifi network)
 const char* password = "jtYP6iaj"; // your network password
 
 // Set up the client objet
-WiFiClient client;
+//WiFiClient client;
+WiFiClientSecure client;
 HTTPClient http;
 
 
 void setup() {
   pinMode(rele, OUTPUT);
-  pinMode(pir, INPUT_PULLUP);
+  pinMode(17, INPUT_PULLUP);
   digitalWrite(rele, HIGH);
 
   Serial.begin(9600);
@@ -44,6 +46,7 @@ void setup() {
   //String ip = WiFi.localIP().toString();
   //Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
   Serial.print("Mensage inicial...\n");
+  client.setInsecure();//skip verification
 }
 
 void loop() {
@@ -111,7 +114,7 @@ void sendGetToServer() {
     int httpCode = http.GET();
     Serial.println("Send get ...");
     if (httpCode > 0) {
-      Serial.println("Get Response from GET");
+      //Serial.println("Get Response from GET");
       String payload = http.getString();
       DynamicJsonDocument doc(200);
       deserializeJson(doc, payload);
