@@ -8,6 +8,13 @@ const int pir = 27;
 
 boolean pirTriggered = false;
 
+boolean motorState = false;
+unsigned long previousMillis = 0;        
+const long intervalOFF = 60000*2;//Intervalo apagado motor en reposo 2'
+const long intervalON = 10000;//Intervalo encendido motor en reposo 10'          
+unsigned long currentMillis = 0;
+
+
 //const char *server_url = "http://olea-api.herokuapp.com";// Nodejs application endpoint
 //const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
 const char *server_url = "http://172.105.85.34";// Nodejs application e
@@ -69,6 +76,20 @@ void loop() {
     delay(1000*5);//Time to deinflate the sculpture
     pirTriggered = false;//Listen for Movement again...
     Serial.print("Pir listening again ...\n");
+    //Reset interval
+     currentMillis = millis();
+     previousMillis = currentMillis;
+  }
+  
+  currentMillis = millis();
+  if (currentMillis - previousMillis >= (motorState ? intervalOFF : intervalON)) {
+    previousMillis = currentMillis;
+    motorState = !motorState;
+    if (motorState) {
+      digitalWrite(rele, HIGH);
+    } else {
+      digitalWrite(rele, LOW);
+    }
   }
 }
 
