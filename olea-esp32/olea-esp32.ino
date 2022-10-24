@@ -1,4 +1,5 @@
 #include <WiFi.h>
+//#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
@@ -6,6 +7,12 @@ const int rele = 26;
 const int pir = 27;
 
 boolean pirTriggered = false;
+
+boolean motorState = false;
+unsigned long previousMillis = 0;        
+const long intervalOFF = 60000*2;//Intervalo apagado motor en reposo 5'
+const long intervalON = 30000;//Intervalo encendido motor en reposo 1'          
+unsigned long currentMillis = 0;
 
 //const char *server_url = "http://olea-api.herokuapp.com";// Nodejs application endpoint
 const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
@@ -16,13 +23,14 @@ const char* ssid     = "MiFibra-2FC9";     // your network SSID (name of wifi ne
 const char* password = "jtYP6iaj"; // your network password
 
 // Set up the client objet
+//WiFiClientSecure client;
 WiFiClient client;
 HTTPClient http;
 
 
 void setup() {
   pinMode(rele, OUTPUT);
-  pinMode(pir, INPUT_PULLUP);
+  pinMode(17, INPUT_PULLUP);
   digitalWrite(rele, HIGH);
 
   Serial.begin(9600);
@@ -44,6 +52,7 @@ void setup() {
   //String ip = WiFi.localIP().toString();
   //Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
   Serial.print("Mensage inicial...\n");
+  //client.setInsecure();//skip verification
 }
 
 void loop() {
@@ -58,12 +67,27 @@ void loop() {
 
     Serial.print("Sending request to server...\n");
     sendPostToServer();//Envia peticion de transaccion
+    //testSendGetToServer();
     delay(1000*10);//Time to inflate the sculpture
     digitalWrite(rele, HIGH);
     Serial.print("Deinflating sculpure...\n");
     delay(1000*5);//Time to deinflate the sculpture
     pirTriggered = false;//Listen for Movement again...
     Serial.print("Pir listening again ...\n");
+    //Reset interval
+     currentMillis = millis();
+     previousMillis = currentMillis;
+  }
+  
+  currentMillis = millis();
+  if (currentMillis - previousMillis >= (motorState ? intervalOFF : intervalON)) {
+    previousMillis = currentMillis;
+    motorState = !motorState;
+    if (motorState) {
+      digitalWrite(rele, HIGH);
+    } else {
+      digitalWrite(rele, LOW);
+    }
   }
 }
 
@@ -75,7 +99,7 @@ void sendPostToServer() {
   String json;
 
   serializeJson(doc, json);
-
+  http.useHTTP10(true);
   http.begin(client, server_url);
   http.setTimeout(20000);//Set 20s wait for response time
   http.addHeader("Content-Type", "application/json");
@@ -135,6 +159,24 @@ void sendGetToServer() {
       } else {
         //Serial.print(id);
       }
+    }
+    http.end();
+    delay(2000);
+  }
+}
+void testSendGetToServer() {
+  boolean wait = true;
+  while (wait) {
+    // Set up the client objet
+    http.begin(server_url);
+    int httpCode = http.GET();
+    Serial.println("Send get ...");
+    if (httpCode > 0) {
+      Serial.println("Get Response from GET");
+      String payload = http.getString();
+      DynamicJsonDocument doc(200);
+      deserializeJson(doc, payload);
+      Serial.println(payload);
     }
     http.end();
     delay(2000);
