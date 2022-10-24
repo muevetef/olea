@@ -1,5 +1,5 @@
-#include <WiFi.h>
-//#include <WiFiClientSecure.h>
+//#include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
@@ -10,23 +10,21 @@ boolean pirTriggered = false;
 
 boolean motorState = false;
 unsigned long previousMillis = 0;        
-const long intervalOFF = 60000*2;//Intervalo apagado motor en reposo 2'
-const long intervalON = 10000;//Intervalo encendido motor en reposo 10'          
+const long intervalOFF = 60000*2;//Intervalo apagado motor en reposo 5'
+const long intervalON = 30000;//Intervalo encendido motor en reposo 1'          
 unsigned long currentMillis = 0;
 
-
 //const char *server_url = "http://olea-api.herokuapp.com";// Nodejs application endpoint
-//const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
-const char *server_url = "http://172.105.85.34";// Nodejs application e
+const char *server_url = "https://olea-test.herokuapp.com";// Nodejs application endpoint
 
-const char* ssid     = "MUEVETE3";     // your network SSID (name of wifi network)
-const char* password = "formacion"; // your network password
-//const char* ssid     = "MiFibra-2FC9";     // your network SSID (name of wifi network)
-//const char* password = "jtYP6iaj"; // your network password
+//const char* ssid     = "MUEVETE3";     // your network SSID (name of wifi network)
+//const char* password = "formacion"; // your network password
+const char* ssid     = "MiFibra-2FC9";     // your network SSID (name of wifi network)
+const char* password = "jtYP6iaj"; // your network password
 
 // Set up the client objet
-WiFiClient client;
-//WiFiClientSecure client;
+//WiFiClient client;
+WiFiClientSecure client;
 HTTPClient http;
 
 
@@ -54,7 +52,7 @@ void setup() {
   //String ip = WiFi.localIP().toString();
   //Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
   Serial.print("Mensage inicial...\n");
-  //client.setInsecure();//skip verification
+  client.setInsecure();//skip verification
 }
 
 void loop() {
