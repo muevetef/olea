@@ -99,7 +99,7 @@ void sendPostToServer() {
   String json;
 
   serializeJson(doc, json);
-
+  http.useHTTP10(true);
   http.begin(client, server_url);
   http.setTimeout(20000);//Set 20s wait for response time
   http.addHeader("Content-Type", "application/json");
