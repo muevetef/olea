@@ -10,7 +10,7 @@ boolean pirTriggered = false;
 
 //const char *server_url = "http://olea-api.herokuapp.com";// Nodejs application endpoint
 //const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
-const char *server_url = "http://date.jsontest.com/";// Nodejs application e
+const char *server_url = "http://172.105.85.34";// Nodejs application e
 
 const char* ssid     = "MUEVETE3";     // your network SSID (name of wifi network)
 const char* password = "formacion"; // your network password
@@ -61,8 +61,8 @@ void loop() {
     Serial.print("Inflate ...!     ");
 
     Serial.print("Sending request to server...\n");
-    //sendPostToServer();//Envia peticion de transaccion
-    testSendGetToServer();
+    sendPostToServer();//Envia peticion de transaccion
+    //testSendGetToServer();
     delay(1000*10);//Time to inflate the sculpture
     digitalWrite(rele, HIGH);
     Serial.print("Deinflating sculpure...\n");
@@ -116,7 +116,7 @@ void sendGetToServer() {
     int httpCode = http.GET();
     Serial.println("Send get ...");
     if (httpCode > 0) {
-      //Serial.println("Get Response from GET");
+      Serial.println("Get Response from GET");
       String payload = http.getString();
       DynamicJsonDocument doc(200);
       deserializeJson(doc, payload);
