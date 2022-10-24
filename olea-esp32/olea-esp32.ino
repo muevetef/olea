@@ -1,5 +1,5 @@
-//#include <WiFi.h>
-#include <WiFiClientSecure.h>
+#include <WiFi.h>
+//#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
@@ -10,15 +10,16 @@ boolean pirTriggered = false;
 
 //const char *server_url = "http://olea-api.herokuapp.com";// Nodejs application endpoint
 //const char *server_url = "http://olea-test.herokuapp.com";// Nodejs application endpoint
-const char *server_url = "https://olea-test.herokuapp.com";// Nodejs application e
-//const char* ssid     = "MUEVETE3";     // your network SSID (name of wifi network)
-//const char* password = "formacion"; // your network password
-const char* ssid     = "MiFibra-2FC9";     // your network SSID (name of wifi network)
-const char* password = "jtYP6iaj"; // your network password
+const char *server_url = "http://date.jsontest.com/";// Nodejs application e
+
+const char* ssid     = "MUEVETE3";     // your network SSID (name of wifi network)
+const char* password = "formacion"; // your network password
+//const char* ssid     = "MiFibra-2FC9";     // your network SSID (name of wifi network)
+//const char* password = "jtYP6iaj"; // your network password
 
 // Set up the client objet
-//WiFiClient client;
-WiFiClientSecure client;
+WiFiClient client;
+//WiFiClientSecure client;
 HTTPClient http;
 
 
@@ -46,7 +47,7 @@ void setup() {
   //String ip = WiFi.localIP().toString();
   //Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
   Serial.print("Mensage inicial...\n");
-  client.setInsecure();//skip verification
+  //client.setInsecure();//skip verification
 }
 
 void loop() {
@@ -60,7 +61,8 @@ void loop() {
     Serial.print("Inflate ...!     ");
 
     Serial.print("Sending request to server...\n");
-    sendPostToServer();//Envia peticion de transaccion
+    //sendPostToServer();//Envia peticion de transaccion
+    testSendGetToServer();
     delay(1000*10);//Time to inflate the sculpture
     digitalWrite(rele, HIGH);
     Serial.print("Deinflating sculpure...\n");
@@ -138,6 +140,24 @@ void sendGetToServer() {
       } else {
         //Serial.print(id);
       }
+    }
+    http.end();
+    delay(2000);
+  }
+}
+void testSendGetToServer() {
+  boolean wait = true;
+  while (wait) {
+    // Set up the client objet
+    http.begin(server_url);
+    int httpCode = http.GET();
+    Serial.println("Send get ...");
+    if (httpCode > 0) {
+      Serial.println("Get Response from GET");
+      String payload = http.getString();
+      DynamicJsonDocument doc(200);
+      deserializeJson(doc, payload);
+      Serial.println(payload);
     }
     http.end();
     delay(2000);
